@@ -1,107 +1,104 @@
 import java.io.*;
-import java.lang.reflect.Array;
 import java.util.*;
 
+/**
+ * [18404] [그래프] 현명한 나이트
+ *
+ * bfs 를 통한 depth 계산
+ * 순서 보장 위해 먼저 depth 계산 후 goal 의 depth 확인
+ **/
+
 public class Main {
-    static FastReader scan = new FastReader();
-    static StringBuilder sb = new StringBuilder();
 
-    static int N, M, sx, sy;
-    static int[][] dist;
-    static int[][] dir = {{-1,-2},{-2,-1},{-1,2},{-2,1},{1,-2},{2,-1},{1,2},{2,1}};
-
-    static void input() {
-        N = scan.nextInt();
-        M = scan.nextInt();
-        sx = scan.nextInt();
-        sy = scan.nextInt();
-        dist = new int[N + 1][N + 1];
-    }
-
-    static void bfs() {
-        for (int i = 1; i <= N; i++) {
-            for (int j = 1; j <= N; j++) {
-                dist[i][j] = -1;
-            }
-        }
-        Queue<Integer> Q = new LinkedList<>();
-        dist[sx][sy] = 0;
-        Q.add(sx);
-        Q.add(sy);
-
-        // BFS 과정 시작
-        while (!Q.isEmpty()) {
-            int x = Q.poll();
-            int y = Q.poll();
-            for (int k = 0; k < 8; k++) {
-                int nx = x + dir[k][0], ny = y + dir[k][1];
-                if (nx < 1 || ny < 1 || nx > N || ny > N) continue;  // 지도를 벗어나는 곳으로 가는가?
-                if (dist[nx][ny] != -1) continue;  // 이미 방문한 적이 있는 곳인가?
-                Q.add(nx);
-                Q.add(ny);
-                dist[nx][ny] = dist[x][y] + 1;
-            }
-        }
-    }
-
-    static void pro() {
-        bfs();
-        while (M-- > 0) {
-            int ex = scan.nextInt();
-            int ey = scan.nextInt();
-            System.out.print(dist[ex][ey]+ " ");
-        }
-    }
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         input();
-        pro();
+        run();
     }
 
+    static int N, M;
+    static Coordinate start;
+    static Coordinate[] goals;
+    static int[][] depth;
 
-    static class FastReader {
-        BufferedReader br;
-        StringTokenizer st;
+    static int[] dr = {-1, 1, -2, 2, -2, 2, -1, 1};
+    static int[] dc = {-2, -2, -1, -1, 1, 1, 2, 2};
 
-        public FastReader() {
-            br = new BufferedReader(new InputStreamReader(System.in));
+    static class Coordinate{
+        int r;
+        int c;
+        int depth;
+
+        public Coordinate(int r, int c, int depth) {
+            this.r = r;
+            this.c = c;
+            this.depth = depth;
         }
 
-        public FastReader(String s) throws FileNotFoundException {
-            br = new BufferedReader(new FileReader(new File(s)));
+        public boolean isEqual(Coordinate o){
+            return  r == o.r && c == o.c;
         }
 
-        String next() {
-            while (st == null || !st.hasMoreElements()) {
-                try {
-                    st = new StringTokenizer(br.readLine());
-                } catch (IOException e) {
-                    e.printStackTrace();
+    }
+
+    static void input() throws IOException{
+        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        StringTokenizer st = new StringTokenizer(in.readLine(), " ");
+
+        N = Integer.parseInt(st.nextToken());
+        M = Integer.parseInt(st.nextToken());
+        goals = new Coordinate[M];
+        depth = new int[N + 1][N + 1];
+
+        st = new StringTokenizer(in.readLine(), " ");
+        int c = Integer.parseInt(st.nextToken());
+        int r = Integer.parseInt(st.nextToken());
+        start = new Coordinate(r,c,0);
+
+        for(int i = 0; i < M; i++){
+            st = new StringTokenizer(in.readLine(), " ");
+            c = Integer.parseInt(st.nextToken());
+            r = Integer.parseInt(st.nextToken());
+            goals[i] = new Coordinate(r,c,0);
+        }
+
+    }
+
+    static void run(){
+        StringBuilder sb = new StringBuilder();
+
+        bfs();
+        for(Coordinate g : goals){
+            sb.append(depth[g.r][g.c]).append(" ");
+        }
+
+        System.out.println(sb);
+    }
+
+    static int bfs(){
+        int ans = 0;
+
+        Queue<Coordinate> q = new LinkedList<>();
+        q.add(start);
+        depth[start.r][start.c] = -1;
+
+        while(!q.isEmpty()){
+            Coordinate current = q.poll();
+
+            for(int i = 0; i < 8; i++){
+                int nr = current.r + dr[i];
+                int nc = current.c + dc[i];
+
+                if(nr > 0 && nc > 0 && nr <= N && nc <= N){
+                    if(depth[nr][nc] == 0){
+                        q.add(new Coordinate(nr,nc,current.depth + 1));
+                        depth[nr][nc] = current.depth + 1;
+                    }
                 }
             }
-            return st.nextToken();
         }
 
-        int nextInt() {
-            return Integer.parseInt(next());
-        }
-
-        long nextLong() {
-            return Long.parseLong(next());
-        }
-
-        double nextDouble() {
-            return Double.parseDouble(next());
-        }
-
-        String nextLine() {
-            String str = "";
-            try {
-                str = br.readLine();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return str;
-        }
+        return ans;
     }
+
+
 }
