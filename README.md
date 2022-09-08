@@ -1,4 +1,4 @@
 # Problem Solving
 # 1. Programmers
 # 2. Baekjoon
-# 3. hackerrank
+# 3. HackerRank
