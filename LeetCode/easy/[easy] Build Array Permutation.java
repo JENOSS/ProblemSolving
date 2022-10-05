@@ -1,7 +1,7 @@
 import java.util.*;
 
 /**
- * [easy] [5] Build Array from Permutation
+ * [easy] [1920] Build Array from Permutation
  *
  */
 
